@@ -1,65 +1,159 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+import { PhoneCall, Loader2, Bot, CheckCircle2 } from "lucide-react";
+
+export default function Dashboard() {
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [leadName, setLeadName] = useState("");
+  const [businessContext, setBusinessContext] = useState("We are 'TechNova Solutions'. We sell premium web development services. Ask the user if they are currently looking to upgrade their website, and if they are, tell them we have a 20% discount this month.")
+  const [status, setStatus] = useState<"idle" | "calling" | "connected" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleCallLead = async () => {
+    if (!phoneNumber) return;
+    
+    setStatus("calling");
+    setErrorMessage("");
+
+    try {
+      // We ping your local Express backend
+      const response = await fetch("http://localhost:8080/api/call/outbound", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          targetPhone: phoneNumber,
+          // Replace this with your actual active ngrok URL!
+          ngrokUrl: "https://ravishing-flyable-detergent.ngrok-free.dev",
+          leadName: leadName,
+          businessContext: businessContext 
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to initiate call");
+      }
+
+      setStatus("connected");
+      
+      // Reset back to idle after 5 seconds
+      setTimeout(() => setStatus("idle"), 5000);
+
+    } catch (error: any) {
+      console.error("Call Error:", error);
+      setStatus("error");
+      setErrorMessage(error.message);
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-slate-50 p-8 font-sans">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <header className="mb-12 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-600 p-2 rounded-xl">
+              <Bot className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-slate-900">VoiceNexus AI</h1>
+          </div>
+          <div className="text-sm font-medium text-slate-500 bg-slate-200 px-4 py-2 rounded-full">
+            Enterprise Dashboard
+          </div>
+        </header>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          
+          {/* Action Card */}
+          <div className="col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">Initiate AI Follow-up</h2>
+            <p className="text-slate-500 mb-8">
+              Enter a lead's phone number below. Our AI will instantly call, qualify the lead, and update the CRM.
+            </p>
+
+<div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Lead Name</label>
+                <input
+                  type="text"
+                  placeholder="e.g. John Doe"
+                  value={leadName}
+                  onChange={(e) => setLeadName(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-slate-900 mb-4"
+                />
+                
+                <label className="block text-sm font-medium text-slate-700 mb-2">AI Business Prompt (How should the AI act?)</label>
+                <textarea
+                  rows={4}
+                  value={businessContext}
+                  onChange={(e) => setBusinessContext(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-slate-900 mb-4"
+                />
+              </div>
+
+            <div className="flex flex-col gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Lead Phone Number (Include Country Code)
+                </label>
+                <input
+                  type="tel"
+                  placeholder="+1234567890"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-slate-900"
+                />
+              </div>
+
+              <button
+                onClick={handleCallLead}
+                disabled={status === "calling" || !phoneNumber}
+                className="mt-4 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-semibold py-3 px-6 rounded-xl transition-all"
+              >
+                {status === "calling" ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Connecting to Telephony...
+                  </>
+                ) : status === "connected" ? (
+                  <>
+                    <CheckCircle2 className="w-5 h-5" />
+                    Call Dispatched!
+                  </>
+                ) : (
+                  <>
+                    <PhoneCall className="w-5 h-5" />
+                    Dispatch AI Agent
+                  </>
+                )}
+              </button>
+
+              {status === "error" && (
+                <div className="mt-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                  {errorMessage}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Stats Sidebar */}
+          <div className="col-span-1 flex flex-col gap-4">
+            <div className="bg-slate-900 rounded-2xl p-6 text-white">
+              <h3 className="text-slate-400 text-sm font-medium mb-1">AI Minutes Used</h3>
+              <div className="text-3xl font-bold">14s / 500m</div>
+            </div>
+            <div className="bg-white rounded-2xl border border-slate-200 p-6">
+              <h3 className="text-slate-500 text-sm font-medium mb-1">Active Leads</h3>
+              <div className="text-3xl font-bold text-slate-900">1</div>
+            </div>
+          </div>
+
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </div>
     </div>
   );
 }
