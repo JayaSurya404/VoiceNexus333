@@ -18,7 +18,7 @@ export default function Dashboard() {
 
     try {
       // We ping your local Express backend
-      const response = await fetch("http://localhost:8080/api/call/outbound", {
+      const response = await fetch("https://voicenexus-api.onrender.com/api/call/incoming", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -26,7 +26,7 @@ export default function Dashboard() {
         body: JSON.stringify({
           targetPhone: phoneNumber,
           // Replace this with your actual active ngrok URL!
-          ngrokUrl: "https://ravishing-flyable-detergent.ngrok-free.dev",
+          ngrokUrl: "https://voicenexus-api.onrender.com/api/call/incoming",
           leadName: leadName,
           businessContext: businessContext 
         }),
