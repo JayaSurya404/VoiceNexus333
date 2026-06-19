@@ -26,7 +26,7 @@ export default function Dashboard() {
         body: JSON.stringify({
           targetPhone: phoneNumber,
           // Replace this with your actual active ngrok URL!
-          ngrokUrl: "https://voicenexus-api.onrender.com/api/call/incoming",
+          ngrokUrl: "https://voicenexus-api.onrender.com",
           leadName: leadName,
           businessContext: businessContext 
         }),
