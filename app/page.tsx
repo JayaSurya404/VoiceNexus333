@@ -17,15 +17,15 @@ export default function Dashboard() {
     setErrorMessage("");
 
     try {
-      // We ping your local Express backend
-      const response = await fetch("https://voicenexus-api.onrender.com/api/call/incoming", {
+      // FIX: Changed from /incoming to /outbound so the frontend receives JSON, not XML.
+      const response = await fetch("https://voicenexus-api.onrender.com/api/call/outbound", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           targetPhone: phoneNumber,
-          // Replace this with your actual active ngrok URL!
+          // Twilio will use this Render URL to connect the audio stream
           ngrokUrl: "https://voicenexus-api.onrender.com",
           leadName: leadName,
           businessContext: businessContext 
@@ -76,7 +76,7 @@ export default function Dashboard() {
               Enter a lead's phone number below. Our AI will instantly call, qualify the lead, and update the CRM.
             </p>
 
-<div>
+            <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Lead Name</label>
                 <input
                   type="text"
