@@ -6,7 +6,8 @@ import { PhoneCall, Loader2, Bot, CheckCircle2 } from "lucide-react";
 export default function Dashboard() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [leadName, setLeadName] = useState("");
-  const [businessContext, setBusinessContext] = useState("We are 'TechNova Solutions'. We sell premium web development services. Ask the user if they are currently looking to upgrade their website, and if they are, tell them we have a 20% discount this month.")
+  // Updated default prompt for Tanglish behavior
+  const [businessContext, setBusinessContext] = useState("We are 'TechNova Solutions'. We sell premium web development services. We are calling an Indian customer. Speak in a friendly Tanglish mix. Ask if they want to upgrade their website with our 20% discount.");
   const [status, setStatus] = useState<"idle" | "calling" | "connected" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -17,7 +18,6 @@ export default function Dashboard() {
     setErrorMessage("");
 
     try {
-      // FIX: Changed from /incoming to /outbound so the frontend receives JSON, not XML.
       const response = await fetch("https://voicenexus-api.onrender.com/api/call/outbound", {
         method: "POST",
         headers: {
@@ -25,8 +25,7 @@ export default function Dashboard() {
         },
         body: JSON.stringify({
           targetPhone: phoneNumber,
-          // Twilio will use this Render URL to connect the audio stream
-          ngrokUrl: "https://voicenexus-api.onrender.com",
+          ngrokUrl: "https://ravishing-flyable-detergent.ngrok-free.dev",
           leadName: leadName,
           businessContext: businessContext 
         }),
@@ -59,7 +58,7 @@ export default function Dashboard() {
             <div className="bg-blue-600 p-2 rounded-xl">
               <Bot className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-slate-900">VoiceNexus AI</h1>
+            <h1 className="text-3xl font-bold text-slate-900">VoiceNexus AI (Tanglish)</h1>
           </div>
           <div className="text-sm font-medium text-slate-500 bg-slate-200 px-4 py-2 rounded-full">
             Enterprise Dashboard
@@ -73,14 +72,14 @@ export default function Dashboard() {
           <div className="col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
             <h2 className="text-xl font-semibold text-slate-900 mb-2">Initiate AI Follow-up</h2>
             <p className="text-slate-500 mb-8">
-              Enter a lead's phone number below. Our AI will instantly call, qualify the lead, and update the CRM.
+              Enter a lead's phone number below. Our AI will instantly call, qualify the lead in Tanglish, and update the CRM.
             </p>
 
             <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Lead Name</label>
                 <input
                   type="text"
-                  placeholder="e.g. John Doe"
+                  placeholder="e.g. Ramesh"
                   value={leadName}
                   onChange={(e) => setLeadName(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-slate-900 mb-4"
@@ -102,7 +101,7 @@ export default function Dashboard() {
                 </label>
                 <input
                   type="tel"
-                  placeholder="+1234567890"
+                  placeholder="+919876543210"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-slate-900"
